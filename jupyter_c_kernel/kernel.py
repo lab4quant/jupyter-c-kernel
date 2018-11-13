@@ -84,7 +84,7 @@ class CKernel(Kernel):
         os.close(mastertemp[0])
         self.master_path = mastertemp[1]
         filepath = path.join(path.dirname(path.realpath(__file__)), 'resources', 'master.c')
-        subprocess.call(['gcc', filepath, '-std=c11', '-rdynamic', '-ldl', '-o', self.master_path])
+        subprocess.call(['gcc', filepath, '-std=c11', '-Wl,--export-all-symbols', '-o', self.master_path])
 
     def cleanup_files(self):
         """Remove all the temporary files created by the kernel"""
@@ -113,7 +113,7 @@ class CKernel(Kernel):
                                   lambda contents: self._write_to_stderr(contents.decode()))
 
     def compile_with_gcc(self, source_filename, binary_filename, cflags=None, ldflags=None):
-        cflags = ['-std=c11', '-fPIC', '-shared', '-rdynamic'] + cflags
+        cflags = ['-std=c11', '-shared', '-Wl,--export-all-symbols'] + cflags
         args = ['gcc', source_filename] + cflags + ['-o', binary_filename] + ldflags
         return self.create_jupyter_subprocess(args)
 
